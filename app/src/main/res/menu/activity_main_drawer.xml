@@ -4,11 +4,19 @@
     tools:showIn="navigation_view">
 
     <group android:checkableBehavior="single">
-
+        <item
+            android:id="@+id/nav_post"
+            android:icon="@drawable/ic_menu_post"
+            android:title="Posts" />
+        <item
+            android:id="@+id/nav_like"
+            android:icon="@drawable/ic_menu_like"
+            android:title="Likes" />
         <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"
             android:title="Setting" />
+
     </group>
 
 

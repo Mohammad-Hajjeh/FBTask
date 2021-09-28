@@ -24,6 +24,7 @@ import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.HttpMethod;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
@@ -40,8 +41,9 @@ public class MainActivity2 extends AppCompatActivity
     RecyclerView recyclerView;
     CallbackManager callbackManager;
     MyAdapter myAdapter;
+    PostAdapter postAdapter;
     RecyclerView.LayoutManager layoutManager;
-
+    TextView total;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,53 +64,48 @@ public class MainActivity2 extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         navigationView.setCheckedItem(R.id.nav_manage);
         View headerView = navigationView.getHeaderView(0);
-        ImageView imageView=headerView.findViewById(R.id.imageView);
+        ImageView imageView = headerView.findViewById(R.id.imageView);
         TextView name = headerView.findViewById(R.id.name);
         TextView email = headerView.findViewById(R.id.email);
+        total = headerView.findViewById(R.id.total);
         Picasso.with(MainActivity2.this).load(intent.getStringExtra("ImageUrl")).into(imageView);
-        name.setText(intent.getStringExtra("FirstName")+" "+intent.getStringExtra("LastName"));
+        name.setText(intent.getStringExtra("FirstName") + " " + intent.getStringExtra("LastName"));
         email.setText(intent.getStringExtra("Email"));
         callbackManager = CallbackManager.Factory.create();
-       // getUserProfile(AccessToken.getCurrentAccessToken());
-
+        getUserProfile(AccessToken.getCurrentAccessToken());
 
 
     }
+
     private void getUserProfile(AccessToken currentAccessToken) {
-        GraphRequest request2 = GraphRequest.newMyFriendsRequest(
-                currentAccessToken.getCurrentAccessToken(), new GraphRequest.GraphJSONArrayCallback() {
-                    @Override
-                    public void onCompleted(JSONArray objects, GraphResponse response) {
-                        Log.d("Demo",objects.toString());
-                        ArrayList<FBFriend> fbFriends = new ArrayList<>();
-                        for (int i = 0; i < objects.length(); i++) {
-                            try {
-                                JSONObject object1 = objects.getJSONObject(i);
-                                fbFriends.add(new FBFriend(object1.getString("id"), object1.getString("name")));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+        new GraphRequest(
+                AccessToken.getCurrentAccessToken(),
+                "/me/friends",
+                null,
+                HttpMethod.GET,
+                new GraphRequest.Callback() {
+                    public void onCompleted(GraphResponse response) {
+                        /* handle the result */
+                        Log.d("TAG", "post" + response.getJSONObject());
+                        try {
+
+                            String jsonObject = response.getJSONObject().getString("summary");
+                            jsonObject = jsonObject.replace('{', ' ');
+                            jsonObject = jsonObject.replace('"', ' ');
+                            jsonObject = jsonObject.replace('}', ' ');
+                            jsonObject = jsonObject.replaceAll("total_count", "total_friends");
+                            jsonObject = jsonObject.trim();
+                            total.setText(jsonObject);
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
-//                        Intent intent = new Intent(MainActivity.this, MainActivity2.class);
-//                        intent.putExtra("myList", fbFriends);
-//                        startActivity(intent);
-                        Toast.makeText(getApplicationContext(), String.valueOf(fbFriends.size()), Toast.LENGTH_SHORT).show();
-//                        recyclerView=findViewById(R.id.rv_friend_list);
-//
-//                        layoutManager=new LinearLayoutManager(MainActivity2.this);
-//                         recyclerView.setLayoutManager(layoutManager);
-//                          myAdapter=new MyAdapter(fbFriends);
-//                          recyclerView.setAdapter(myAdapter);
-
                     }
+                }
+        ).executeAsync();
 
 
-                });
-
-        Bundle parameters2 = new Bundle();
-        parameters2.putString("fields", "first_name,last_name,email,id");
-        request2.setParameters(parameters2);
-        request2.executeAsync();
 
     }
 
@@ -154,10 +151,17 @@ public class MainActivity2 extends AppCompatActivity
 //        FragmentManager fragmentManager = getSupportFragmentManager();
 //
         if (id == R.id.nav_manage) {
-        Intent intent = new Intent(MainActivity2.this,MainActivity3.class);
-        startActivity(intent);
+            Intent intent = new Intent(MainActivity2.this, MainActivity3.class);
+            startActivity(intent);
         }
-
+        else if (id == R.id.nav_like) {
+            Intent intent = new Intent(MainActivity2.this, MainActivity4.class);
+            startActivity(intent);
+        }
+        else if (id == R.id.nav_post) {
+            Intent intent = new Intent(MainActivity2.this, MainActivity5.class);
+            startActivity(intent);
+        }
 //        } else if (id == R.id.nav_gallery) {
 //            fragment = new GalleryFragment();
 //        } else if (id == R.id.nav_slideshow) {

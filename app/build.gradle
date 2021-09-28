@@ -21,6 +21,7 @@ android {
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
     }
 }
 
@@ -33,7 +34,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation "com.google.android.material:material:1.2.0-alpha05"
-    implementation 'com.facebook.android:facebook-android-sdk:4.31.0'
+    implementation 'com.facebook.android:facebook-login:11.3.0'
     implementation 'com.squareup.picasso:picasso:2.5.2'
 
 }
